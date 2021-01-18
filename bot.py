@@ -7,4 +7,4 @@ client = commands.Bot(command_prefix='!')
 async def on_ready():
     print('Greetings, I am MaxBot')
 
-client.run('ODAwMTMyOTY3MzMwNjExMjQx.YANr5Q.ivKjqUPtWgMIiK7w0cOffVCsJCQ')
+client.run('')
