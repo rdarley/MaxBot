@@ -15,19 +15,25 @@ engine = create_engine('sqlite:///maxbot.db', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-load_dotenv()
-
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-
 # If table doesn't exist, Create the database
 if not engine.dialect.has_table(engine, 'member'):
     Base.metadata.create_all(engine)
 
-bot = commands.Bot(command_prefix='!')
+class MaxBot(commands.Bot):
 
-@bot.event
-async def on_ready():
-    print('Greetings, I am MaxBot')
+    def __init__(self,command_prefix):
+        super().__init__(command_prefix=command_prefix)
+
+        # Load in Cogs
+        # for f in os.listdir('src/cogs'):
+        #     file_name, file_extension = os.path.splitext(f)
+        #     if file_extension == '.py':
+        #         self.load_extension(f'cogs.{file_name}')
+
+    async def on_ready(self):
+        print('Greetings, I am MaxBot')
+
+bot = MaxBot(command_prefix='!')
 
 @bot.command()
 async def ping(ctx):
@@ -36,27 +42,27 @@ async def ping(ctx):
 @bot.command(aliases=['8ball'])
 async def _8ball(ctx, *, question):
     responses=['It is certain.',
-               'It is decidedly so.',
-               'Without a doubt.',
-               'Yes – definitely.',
-               'You may rely on it.',
-               'As I see it, yes.',
-               'Most likely.',
-               'Outlook good.',
-               'Yes.',
-               'Signs point to yes.',
-               'Reply hazy, try again.',
-               'Ask again later.',
-               'Better not tell you now.',
-               'Cannot predict now.',
-               'Concentrate and ask again.',
-               "Dont count on it.",
-               'My reply is no.',
-               'My sources say no.',
-               'Outlook not so good.',
-               'Very doubtful.']
+            'It is decidedly so.',
+            'Without a doubt.',
+            'Yes – definitely.',
+            'You may rely on it.',
+            'As I see it, yes.',
+            'Most likely.',
+            'Outlook good.',
+            'Yes.',
+            'Signs point to yes.',
+            'Reply hazy, try again.',
+            'Ask again later.',
+            'Better not tell you now.',
+            'Cannot predict now.',
+            'Concentrate and ask again.',
+            "Dont count on it.",
+            'My reply is no.',
+            'My sources say no.',
+            'Outlook not so good.',
+            'Very doubtful.']
     await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
-
+    
 @bot.command()
 async def inspire(ctx):
     """Generates Inspiration using the Inspirobot API"""
@@ -66,7 +72,7 @@ async def inspire(ctx):
         response = requests.get(url, params, timeout=10)
         image = response.text
         await ctx.send(image)
-        
+
     except RequestException:
         await ctx.send('Inspirobot is non-responsive, there is no light in the darkness.')
 
@@ -95,14 +101,13 @@ async def save(ctx, name, url):
         await ctx.send('Could not complete your command')
         print(e)
 
-# for f in os.listdir('./cogs'):
-#     file_name, file_extension = os.path.splitext(f)
-#     if file_extension == '.py':
-#         bot.load_extension(f'cogs.{file_name}')
-
 if __name__ == '__main__':
+
+    load_dotenv()
+
+    DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
     try:
-        bot.run(DISCORD_TOKEN)
+      bot.run(DISCORD_TOKEN)
     except Exception as e:
         print('Could Not Start Bot')
         print(e)
