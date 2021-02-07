@@ -6,11 +6,13 @@ from requests.exceptions import RequestException
 from sqlalchemy import engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-from db.models import Base, Inspiration, Member
+from db.models import Inspiration, Member
+from db.interface import MaxBotDBInterface
 
 class InspiroBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.interface = MaxBotDBInterface()
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -38,24 +40,27 @@ class InspiroBot(commands.Cog):
         '''
         server = ctx.guild.name
         author = ctx.message.author.name
-        avatar = ctx.message.author.avatar_url
         member_id = ctx.message.author.id
 
+        session = self.interface.database.Session()
+
         try:
-            count = self.bot.session.query(Member).filter(Member.id == id).count()
-
+            member = self.interface.find_member(session,member_id)
+        except Exception as e:
             # Create member if they do not exist in our database
-            if count < 1:
-                member = Member(id=id, name=author, avatar=avatar)
-                self.bot.session.add(member)
+            member = Member(id=member_id, name=author, server=server)
+            self.interface.database.add_object(session,member)
 
+        try:
             inspo = Inspiration(name=name, server=server, url=url, member_id=member_id)
-            self.bot.session.add(inspo)
-            self.bot.session.commit()
+            self.interface.database.add_object(session,inspo)
+            session.commit()
             await ctx.send(f'Image saved as {name}')
         except Exception as e:
             await ctx.send('Could not complete your command')
             print(e)
+        finally:
+            session.close()
 
 def setup(bot):
     bot.add_cog(InspiroBot(bot))
