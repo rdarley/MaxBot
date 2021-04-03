@@ -1,9 +1,14 @@
 import discord
 import random
 import os
+import requests
 
 from discord.ext import commands
 from dotenv import load_dotenv
+from sqlalchemy import engine, create_engine
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+from requests.exceptions import RequestException
 
 class MaxBot(commands.Bot):
 
@@ -13,7 +18,7 @@ class MaxBot(commands.Bot):
         # Load in Cogs
         for f in os.listdir('src/cogs'):
             file_name, file_extension = os.path.splitext(f)
-            if file_extension == '.py':
+            if file_extension == '.py' and not file_name.startswith('__'):
                 self.load_extension(f'cogs.{file_name}')
 
     async def on_ready(self):
@@ -54,5 +59,8 @@ if __name__ == '__main__':
     load_dotenv()
 
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-
-    bot.run(DISCORD_TOKEN)
+    try:
+      bot.run(DISCORD_TOKEN)
+    except Exception as e:
+        print('Could Not Start Bot')
+        print(e)
