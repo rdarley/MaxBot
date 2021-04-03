@@ -22,32 +22,37 @@ class InspiroBot(commands.Cog):
 
     @commands.command()
     async def inspire(self, ctx, name=None):
-        """Generates Inspiration using the Inspirobot API"""
+        """Generates Inspiration using the Inspirobot API or loads in an existing inspiration from the database.
+        """
         if name:
+            session = self.interface.database.Session()
             try:
-                inspo = self.interface
-                self.interface.database.add_object(session,inspo)
-                session.commit()
-            await ctx.send(f'Image saved as {name}')
+                inspirations = self.interface.find_items_by_name(session,name,item_type=Inspiration)
+                if len(inspirations) > 1:
+                    await ctx.send(f'Multiple inspirations found, please be more specific')
+                    raise Exception()
+                inspo = inspirations[0]
+                await ctx.send(f'Loaded saved inspiration: {inspo.name}')
+                await ctx.send(inspo.url)
             except Exception as e:
-                await ctx.send('Could not complete your command')
+                await ctx.send(f'Could load saved inspiration with keyword {name}')
                 print(e)
             finally:
                 session.close()
-        try:
-            url = 'http://inspirobot.me/api'
-            params = {'generate':'true'}
-            response = requests.get(url, params, timeout=10)
-            image = response.text
-            await ctx.send(image)
-            
-        except RequestException:
-            await ctx.send('Inspirobot is non-responsive, there is no light in the darkness.')
+        else:
+            try:
+                url = 'http://inspirobot.me/api'
+                params = {'generate':'true'}
+                response = requests.get(url, params, timeout=10)
+                image = response.text
+                await ctx.send(image)
+                
+            except RequestException:
+                await ctx.send('Inspirobot is non-responsive, there is no light in the darkness.')
 
     @commands.command()
     async def save_inspiration(self, ctx, name, url):
-        '''Creates an event with specified name and date
-            example: ?create party 12/22/2017 1:40pm
+        '''Stores an inspiration for later retrieval.
         '''
         server = ctx.guild.name
         author = ctx.message.author.name
