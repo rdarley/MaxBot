@@ -25,7 +25,7 @@ class InspiroBot(commands.Cog):
         """Generates Inspiration using the Inspirobot API"""
         if name:
             try:
-                inspo = self.interface.
+                inspo = self.interface
                 self.interface.database.add_object(session,inspo)
                 session.commit()
             await ctx.send(f'Image saved as {name}')
