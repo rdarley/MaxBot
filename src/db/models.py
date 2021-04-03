@@ -58,16 +58,25 @@ class MaxBotDB():
         return expression.and_(filter_value[0])
 
 class Inspiration(Base):
-    __tablename__ = 'inspiration'
+    __tablename__ = 'inspirations'
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String)
-    server = Column(String)
-    url = Column(String)
-    member_id = Column(Integer, ForeignKey('member.id'))
+    name = Column(String, nullable=False)
+    server = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    member_id = Column(Integer, ForeignKey('members.id'), nullable=False)
 
 class Member(Base):
-    __tablename__ = 'member'
+    __tablename__ = 'members'
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String)
-    server = Column(String)
+    name = Column(String, nullable=False)
+    server = Column(String, nullable=False)
     inspirations = relationship("Inspiration")
+    sound = relationship("Sound")
+
+class Sound(Base):
+    __tablename__ = 'sounds'
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
+    server = Column(String, nullable=False)
+    location = Column(String, nullable=False)
+    member_id = Column(Integer, ForeignKey('members.id'), nullable=False)
