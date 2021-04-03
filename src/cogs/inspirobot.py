@@ -21,8 +21,19 @@ class InspiroBot(commands.Cog):
             await channel.send('Welcome {0.mention}.'.format(member))
 
     @commands.command()
-    async def inspire(self, ctx):
+    async def inspire(self, ctx, name=None):
         """Generates Inspiration using the Inspirobot API"""
+        if name:
+            try:
+                inspo = self.interface.
+                self.interface.database.add_object(session,inspo)
+                session.commit()
+            await ctx.send(f'Image saved as {name}')
+            except Exception as e:
+                await ctx.send('Could not complete your command')
+                print(e)
+            finally:
+                session.close()
         try:
             url = 'http://inspirobot.me/api'
             params = {'generate':'true'}
@@ -34,7 +45,7 @@ class InspiroBot(commands.Cog):
             await ctx.send('Inspirobot is non-responsive, there is no light in the darkness.')
 
     @commands.command()
-    async def save(self, ctx, name, url):
+    async def save_inspiration(self, ctx, name, url):
         '''Creates an event with specified name and date
             example: ?create party 12/22/2017 1:40pm
         '''

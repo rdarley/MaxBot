@@ -14,9 +14,13 @@ class MaxBotDBInterface():
             raise Exception('Member ID or Name Required')
 
         try:
-            member = self.database.query_by_filter(session, Member, expr)[0]
+            member = self.database.query_by_filter(session, Member, expr, limit=1)[0]
 
         except IndexError:
             raise Exception('Member not found')
 
         return member
+
+    def find_items_by_name(self, session, name, item_type=None, sort=None, limit=10):
+        expr = item_type.name.ilike(f'%{name}%')
+        return self.database.query_by_filter(session, item_type, expr, sort=sort, limit=limit)
