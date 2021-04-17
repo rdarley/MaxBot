@@ -35,7 +35,7 @@ class InspiroBot(commands.Cog):
                 await ctx.send(f'Loaded saved inspiration: {inspo.name}')
                 await ctx.send(inspo.url)
             except Exception as e:
-                await ctx.send(f'Could load saved inspiration with keyword {name}')
+                await ctx.send(f'Could not load saved inspiration with keyword {name}')
                 print(e)
             finally:
                 session.close()
@@ -74,6 +74,35 @@ class InspiroBot(commands.Cog):
             await ctx.send(f'Image saved as {name}')
         except Exception as e:
             await ctx.send('Could not complete your command')
+            print(e)
+        finally:
+            session.close()
+
+    @commands.command()
+    async def delete_inspiration(self, ctx, name):
+        '''Delete an inspiration from the database.
+        '''
+        author = ctx.message.author
+        member_id = ctx.message.author.id
+
+        session = self.interface.database.Session()
+
+        try:
+            if author.guild_permissions.administrator:
+                inspos = self.interface.find_items_by_name(session, name=name, item_type=Inspiration, exact_match=True)
+                if len(inspos) > 1:
+                    raise('Need to make Name Unique')
+                self.interface.delete_item_by_id(session,id=inspos[0].id,item_type=Inspiration)
+                await ctx.send(f'Inspiration with name {name} successfully deleted')
+            else:
+                inspos = self.interface.find_items_by_member(session,member_id,item_type=Inspiration,sort=Inspiration.id)
+                for inspo in inspos:
+                    if inspo.name == name:
+                        self.interface.delete_item_by_id(session,id=inspo.id,item_type=Inspiration)
+                        session.commit()
+                        await ctx.send(f'Inspiration with name {name} successfully deleted')
+        except Exception as e:
+            await ctx.send('Could not complete command')
             print(e)
         finally:
             session.close()
