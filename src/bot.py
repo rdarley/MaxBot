@@ -45,7 +45,7 @@ async def _8ball(ctx, *, question):
             'Reply hazy, try again.',
             'Ask again later.',
             'Better not tell you now.',
-            'Cannot predict now.',,
+            'Cannot predict now.',
             "Don't count on it.",
             'My reply is no.',
             'My sources say no.',
