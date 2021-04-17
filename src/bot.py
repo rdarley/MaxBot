@@ -2,6 +2,7 @@ import discord
 import random
 import os
 import requests
+import traceback
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -62,5 +63,6 @@ if __name__ == '__main__':
     try:
       bot.run(DISCORD_TOKEN)
     except Exception as e:
+        track = traceback.format_exc()
         print('Could Not Start Bot')
-        print(e)
+        print(track)
