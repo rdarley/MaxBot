@@ -21,6 +21,16 @@ class MaxBotDBInterface():
 
         return member
 
-    def find_items_by_name(self, session, name, item_type=None, sort=None, limit=10):
+    def find_items_by_name(self, session, name, item_type, sort=None, limit=10):
         expr = item_type.name.ilike(f'%{name}%')
         return self.database.query_by_filter(session, item_type, expr, sort=sort, limit=limit)
+
+    def find_items_by_member(self, session, member_id, item_type, sort=None, limit=10):
+        # TODO: Finish this
+
+    def find_item_by_id(self, session, id, item_type):
+        # TODO: Finish this
+
+    def delete_item_by_id(self, session, id, item_type):
+        expr = item_type.id == id
+        return self.database.delete_entry(session,item_type,expr)

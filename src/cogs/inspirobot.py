@@ -78,5 +78,34 @@ class InspiroBot(commands.Cog):
         finally:
             session.close()
 
+    @commands.command()
+    async def delete_inspiration(self, ctx, name):
+        '''Delete an inspiration from the database.
+        '''
+        server = ctx.guild.name
+        author = ctx.message.author.name
+        member_id = ctx.message.author.id
+
+        session = self.interface.database.Session()
+
+        try:
+            inspos = self.interface.find_items_by_member(session,member_id,item_type=Inspiration,sort=Inspiration.id)
+        except Exception as e:
+            await ctx.send('Could not complete your command')
+            print(e)
+
+        try:
+            inspo = Inspiration(name=name, server=server, url=url, member_id=member_id)
+            self.interface.database.add_object(session,inspo)
+            session.commit()
+            await ctx.send(f'Image saved as {name}')
+        except Exception as e:
+            await ctx.send('Could not complete your command')
+            print(e)
+        finally:
+            session.close()
+
+
+
 def setup(bot):
     bot.add_cog(InspiroBot(bot))
