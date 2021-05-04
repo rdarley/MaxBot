@@ -130,3 +130,7 @@ dmypy.json
 
 # SQLite DB
 *.db
+
+# Sound Files for Testing
+.mp3
+.wav
