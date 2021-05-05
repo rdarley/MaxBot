@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, Integer, engine, create_engine, exists
+from sqlalchemy import Column, ForeignKey, String, Integer, engine, create_engine, exists, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.orm import relationship, sessionmaker
@@ -76,7 +76,8 @@ class Member(Base):
 class Sound(Base):
     __tablename__ = 'sounds'
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String, nullable=False)
+    command = Column(String, nullable=False)
     server = Column(String, nullable=False)
-    location = Column(String, nullable=False)
+    file_location = Column(String, nullable=False)
     member_id = Column(Integer, ForeignKey('members.id'), nullable=False)
+    nsfw = Column(Boolean, nullable=False)
