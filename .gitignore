@@ -134,3 +134,5 @@ dmypy.json
 # Sound Files for Testing
 *.mp3
 *.wav
+sounds/
+sounds2/

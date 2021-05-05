@@ -76,8 +76,8 @@ class Member(Base):
 class Sound(Base):
     __tablename__ = 'sounds'
     id = Column(Integer, primary_key=True, nullable=False)
-    command = Column(String, nullable=False)
+    command = Column(String, nullable=True)
     server = Column(String, nullable=False)
-    file_location = Column(String, nullable=False)
+    file_name = Column(String, nullable=False)
     member_id = Column(Integer, ForeignKey('members.id'), nullable=False)
     nsfw = Column(Boolean, nullable=False)

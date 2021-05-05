@@ -7,13 +7,15 @@ import discord
 import requests
 import youtube_dl
 import asyncio
+import os
 
+from dotenv import load_dotenv
 from discord.ext import commands
 from requests.exceptions import RequestException
 from sqlalchemy import engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-from db.models import Inspiration, Member
+from db.models import Member, Sound
 from db.interface import MaxBotDBInterface
 
 # Suppress noise about console usage from errors
@@ -64,8 +66,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 class SoundBot(commands.Cog):
     def __init__(self, bot):
+        load_dotenv()
+
         self.bot = bot
         self.interface = MaxBotDBInterface()
+        self.SOUND_DIRECTORY = os.getenv("SOUND_DIRECTORY")
 
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
@@ -77,13 +82,22 @@ class SoundBot(commands.Cog):
         await channel.connect()
 
     @commands.command()
-    async def play(self, ctx, *, query):
-        """Plays a file from the local filesystem"""
+    async def play(self, ctx, *, command):
+        """Plays a file associated with the command"""
 
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
+        session = self.interface.database.Session()
 
-        await ctx.send(f'Now playing: {query}')
+        try:
+            sound = self.interface.find_sound_by_command(session,command)[0]
+            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{self.SOUND_DIRECTORY}/{sound.file_name}'), volume=.25)
+            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
+            await ctx.send(f'Now playing: {command}')
+        except Exception as e:
+            await ctx.send(f'Could not find saved sound with command {command}')
+            print(e)
+        finally:
+            session.close()
+
 
     @commands.command()
     async def yt(self, ctx, *, url):

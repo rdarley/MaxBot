@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from db.models import MaxBotDB, Member
+from db.models import MaxBotDB, Member, Sound
 
 class MaxBotDBInterface():
     def __init__(self, **kwargs):
@@ -35,6 +35,10 @@ class MaxBotDBInterface():
     def find_item_by_id(self, session, id, item_type):
         # TODO: Finish this
         return None
+
+    def find_sound_by_command(self, session, command):
+        expr = Sound.command == command
+        return self.database.query_by_filter(session, Sound, expr, sort=None, limit=1)
 
     def delete_item_by_id(self, session, id, item_type):
         expr = item_type.id == id
