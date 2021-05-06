@@ -86,17 +86,20 @@ class SoundBot(commands.Cog):
         """Plays a file associated with the command"""
 
         session = self.interface.database.Session()
-
+        sound_file_path = ''
         try:
-            sound = self.interface.find_sound_by_command(session,command)[0]
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{self.SOUND_DIRECTORY}/{sound.file_name}'))
-            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
-            await ctx.send(f'Now playing: {command}')
+            sounds = self.interface.find_sound_by_command(session,command)[0]
+            sound_file_path = f'{self.SOUND_DIRECTORY}/{sound.file_name}'
         except Exception as e:
             await ctx.send(f'Could not find saved sound with command {command}')
             print(e)
         finally:
             session.close()
+
+        if os.path.isfile(sound_file_path):
+            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(sound_file_path))
+            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
+            await ctx.send(f'Now playing: {command}')
 
 
     @commands.command()
