@@ -88,7 +88,7 @@ class SoundBot(commands.Cog):
         session = self.interface.database.Session()
         sound_file_path = ''
         try:
-            sounds = self.interface.find_sound_by_command(session,command)[0]
+            sound = self.interface.find_sound_by_command(session,command)[0]
             sound_file_path = f'{self.SOUND_DIRECTORY}/{sound.file_name}'
         except Exception as e:
             await ctx.send(f'Could not find saved sound with command {command}')
