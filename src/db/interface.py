@@ -40,6 +40,9 @@ class MaxBotDBInterface():
         expr = Sound.command == command
         return self.database.query_by_filter(session, Sound, expr, sort=None, limit=1)
 
+    def get_all_items(self, session, item_type, sort):
+        return self.database.query_all(session, item_type, sort=sort)
+
     def delete_item_by_id(self, session, id, item_type):
         expr = item_type.id == id
         return self.database.delete_entry(session,item_type,expr)

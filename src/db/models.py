@@ -33,6 +33,9 @@ class MaxBotDB():
         filter_value = self.combine_filter(args)
         return session.query(obj_type).filter(filter_value).order_by(sort).limit(limit).all()
 
+    def query_all(self, session, obj_type, sort=None, limit=None):
+        return session.query(obj_type).order_by(sort).all()
+
     def delete_entry(self, session, obj_type, *args):
 
         filter_value = self.combine_filter(args)
@@ -76,7 +79,7 @@ class Member(Base):
 class Sound(Base):
     __tablename__ = 'sounds'
     id = Column(Integer, primary_key=True, nullable=False)
-    command = Column(String, nullable=True)
+    command = Column(String, nullable=False)
     server = Column(String, nullable=False)
     file_name = Column(String, nullable=False)
     member_id = Column(Integer, ForeignKey('members.id'), nullable=False)

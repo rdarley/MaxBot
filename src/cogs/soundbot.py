@@ -89,7 +89,7 @@ class SoundBot(commands.Cog):
 
         try:
             sound = self.interface.find_sound_by_command(session,command)[0]
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{self.SOUND_DIRECTORY}/{sound.file_name}'), volume=.25)
+            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f'{self.SOUND_DIRECTORY}/{sound.file_name}'))
             ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
             await ctx.send(f'Now playing: {command}')
         except Exception as e:
@@ -134,6 +134,21 @@ class SoundBot(commands.Cog):
         """Stops and disconnects the bot from voice"""
 
         await ctx.voice_client.disconnect()
+
+    @commands.command()
+    async def list(self, ctx):
+        """Sends the user a DM with the list of available sounds"""
+        session = self.interface.database.Session()
+
+        try:
+            sounds = self.interface.get_all_items(session, Sound, "command")
+        except Exception as e:
+            print(e)
+        finally:
+            session.close()
+        sound_chunks = [sounds[i:i + 100] for i in range(0,len(sounds), 100)]
+        for chunk in sound_chunks:
+            await ctx.message.author.send('`' + ', '.join([sound.command for sound in chunk]) + '`')
 
     @play.before_invoke
     @yt.before_invoke
